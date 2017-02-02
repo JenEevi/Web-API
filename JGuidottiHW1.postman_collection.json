@@ -1,0 +1,51 @@
+{
+	"id": "050f6fcb-4d52-04f4-d1a1-a25875f048f0",
+	"name": "HW1",
+	"description": "",
+	"order": [
+		"2bca6c8b-fe17-eb76-5604-7e009017e546",
+		"2d553437-35e3-bc1d-09b2-9c72bddd0c1f"
+	],
+	"folders": [],
+	"timestamp": 1485889198802,
+	"owner": "1479821",
+	"public": false,
+	"requests": [
+		{
+			"id": "2bca6c8b-fe17-eb76-5604-7e009017e546",
+			"headers": "",
+			"url": "https://www.googleapis.com/books/v1/volumes?q={{book_title}} ",
+			"preRequestScript": "postman.setEnvironmentVariable(\"book_title\", \"Turing\");",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "params",
+			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\n\nvar jsonData = JSON.parse(responseBody);{\n    for(var i = 0; i < jsonData.items.length; i++){\n    var id = jsonData.items[i].id;\n    }\n}\n\npostman.setEnvironmentVariable(\"id\", id);\n\nvar jsonData = JSON.parse(responseBody);{\ntests[\"Checks for Turing in Title\"] = responseBody.has(environment.book_title);\n}",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1485892064487,
+			"name": "Get Request for Book Title",
+			"description": "The HTTP `GET` request method is meant to retrieve data from a server. The data\nis identified by a unique URI (Uniform Resource Identifier). \n\nA `GET` request can pass parameters to the server using \"Query String \nParameters\". For example, in the following request,\n\n> http://example.com/hi/there?hand=wave\n\nThe parameter \"hand\" has the value \"wave\".\n\nThis endpoint echoes the HTTP headers, request parameters and the complete\nURI requested.",
+			"collectionId": "050f6fcb-4d52-04f4-d1a1-a25875f048f0",
+			"responses": []
+		},
+		{
+			"id": "2d553437-35e3-bc1d-09b2-9c72bddd0c1f",
+			"headers": "",
+			"url": "https://www.googleapis.com/books/v1/volumes/{{id}}",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "params",
+			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\n\nvar jsonData = JSON.parse(responseBody);{\n    environment.id;\n}\n\nvar jsonData = JSON.parse(responseBody);\ntests[\"Verify id matches\"] = jsonData.id.has(environment.id);",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1485893623659,
+			"name": "Get Request for ID",
+			"description": "The HTTP `GET` request method is meant to retrieve data from a server. The data\nis identified by a unique URI (Uniform Resource Identifier). \n\nA `GET` request can pass parameters to the server using \"Query String \nParameters\". For example, in the following request,\n\n> http://example.com/hi/there?hand=wave\n\nThe parameter \"hand\" has the value \"wave\".\n\nThis endpoint echoes the HTTP headers, request parameters and the complete\nURI requested.",
+			"collectionId": "050f6fcb-4d52-04f4-d1a1-a25875f048f0",
+			"responses": []
+		}
+	]
+}
