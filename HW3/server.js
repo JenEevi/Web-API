@@ -8,7 +8,7 @@ var github = new GitHubApi({
     version: "3.0.0"
 });
 
-var AUTH_TOKEN = "84f7041a2a3302c01a253cbcd5cb800ee1234c7d";
+var AUTH_TOKEN = "This is where I placed my Github Token";
 
 github.authenticate({
     type: "oauth",
