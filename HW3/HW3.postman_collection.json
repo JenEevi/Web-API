@@ -1,0 +1,99 @@
+{
+	"id": "f805554e-29e1-44b1-b98e-0c0cc2fd7ee4",
+	"name": "HW3",
+	"description": "",
+	"order": [
+		"2d3df27b-e2eb-f881-7c3f-c6338fec5b26",
+		"cd1659c5-25e1-7edc-3fc1-b01b598b7cc4",
+		"5a3adeca-b68f-328b-5b3d-f63ca265a43f",
+		"be736fbe-a28d-c714-b399-6d0fc4140860"
+	],
+	"folders": [],
+	"timestamp": 0,
+	"owner": "1479821",
+	"public": false,
+	"requests": [
+		{
+			"headers": "Content-Type: application/x-www-form-urlencoded\n",
+			"url": "https://jengui-test.apigee.net/oauth/client_credential/accesstoken?grant_type=client_credentials",
+			"pathVariables": {},
+			"preRequestScript": null,
+			"method": "POST",
+			"data": [
+				{
+					"key": "client_id",
+					"value": "AVBKj3pnt5ocNyB0vBlE0l5wTsdYt9lH ",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "83sfdfKhAgmGg4NT",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"name": "https://jengui-test.apigee.net/oauth/client_credential/accesstoken?grant_type=client_credentials",
+			"description": "",
+			"descriptionFormat": "html",
+			"tests": "var jsonData = JSON.parse(responseBody)\npostman.setEnvironmentVariable(\"access_token\", jsonData.access_token);",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"folder": null,
+			"id": "2d3df27b-e2eb-f881-7c3f-c6338fec5b26",
+			"collectionId": "f805554e-29e1-44b1-b98e-0c0cc2fd7ee4"
+		},
+		{
+			"id": "5a3adeca-b68f-328b-5b3d-f63ca265a43f",
+			"url": "http://jengui-test.apigee.net/HW3/get",
+			"method": "GET",
+			"headers": "//Authorization: Bearer {{access_token}}\n",
+			"data": [],
+			"dataMode": "urlencoded",
+			"tests": "var jsonData = JSON.parse(responseBody);{\n    environment.access_token;\n}",
+			"preRequestScript": "",
+			"currentHelper": "normal",
+			"pathVariables": {},
+			"version": 2,
+			"name": "http://jengui-test.apigee.net/HW3/get",
+			"description": "",
+			"descriptionFormat": "html",
+			"collectionId": "f805554e-29e1-44b1-b98e-0c0cc2fd7ee4"
+		},
+		{
+			"id": "be736fbe-a28d-c714-b399-6d0fc4140860",
+			"url": "http://jengui-test.apigee.net/HW3/get",
+			"method": "PUT",
+			"headers": "Authorization: Bearer {{access_token}}\n",
+			"data": [],
+			"dataMode": "urlencoded",
+			"tests": "var jsonData = JSON.parse(responseBody);{\n    environment.access_token;\n}",
+			"preRequestScript": "",
+			"currentHelper": "normal",
+			"pathVariables": {},
+			"version": 2,
+			"name": "http://jengui-test.apigee.net/HW3/get",
+			"description": "",
+			"descriptionFormat": "html",
+			"collectionId": "f805554e-29e1-44b1-b98e-0c0cc2fd7ee4"
+		},
+		{
+			"id": "cd1659c5-25e1-7edc-3fc1-b01b598b7cc4",
+			"url": "http://jengui-test.apigee.net/HW3",
+			"method": "GET",
+			"headers": "Authorization: Bearer {{access_token}}\n",
+			"data": [],
+			"dataMode": "urlencoded",
+			"tests": "var jsonData = JSON.parse(responseBody);{\n    environment.access_token\n}",
+			"preRequestScript": "",
+			"currentHelper": "normal",
+			"pathVariables": {},
+			"version": 2,
+			"name": "http://jengui-test.apigee.net/HW3",
+			"description": "",
+			"descriptionFormat": "html",
+			"collectionId": "f805554e-29e1-44b1-b98e-0c0cc2fd7ee4"
+		}
+	]
+}
