@@ -1,0 +1,15 @@
+{
+  "name": "hw4_movie_db",
+  "version": "1.0.0",
+  "description": "Homework 4 for WebAPI",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jennifer Guidotti",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.2",
+    "usergrid": "^2.0.0-rc.2"
+  }
+}
