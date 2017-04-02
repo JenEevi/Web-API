@@ -1,54 +1,60 @@
 //HW4 Jennifer Guidotti
+//using NPM pulled in all the packages that we need.
+var express = require('express'); //call express
+var app = express(); //define our app using express
+var bodyParser = require('body-parser'); //get body-parser
+var morgan = require('morgan'); //user to see requests
+var port = process.env.PORT || 1337; //set the port for our app
+var mongoose = require('mongoose');
+var mlab = require('mongolab-data-api')('Bnto1o6AjgUvuhxzIZLPn2rpyvTwidtU');
 
-var express = require('express');
-var app = express();
-var bodyparser = require('body-parser');
+//App Configuration
+//user body parser so we can grab information from POST requests
+app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.json());
 
-//using the usergrid npm module
-var usergrid = require('usergrid');
-
-//create the basic client object
-var Usergrid = require('usergrid');
-//initiated based on config file
-Usergrid.init();
-
-var client = new usergrid.client({
-    logging: true
+//configure our app to handle CORS requests
+app.use(function(req, res, next){
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, \ Authorization');
+    next();
 });
 
-//Get
-app.get('/movies', function (req, res, err) {
-    //options for the request
+//log all requests to the console
+app.use(morgan('dev'));
+
+//Routes for our API
+//this section holds all the routers
+//=====================
+
+//basic route for the home page
+app.get('/', function(req, res){
+    res.send('Welcome to the home page for the database!');
+});
+
+app.get('/movies', function (req, res){
     var options = {
-        endpoint: "movies", // the collection we are going to query
-        qs: {ql: req.query.title}
+        database: 'movies',
+        collectionName: 'movies'
     }
-    client.request(options, function (err, data) {
-
-        if (err) {
-            res.send(err)
-        }
+    mlab.listDocuments(options, function(err, data){
+        if(err){res.json('There was an error obtaining the collection')}
         else {
-            if (req.query == {}) {
-                res.send(data)//If user requests entire list
-            }
-            else {
-                res.send(data)
-            }
+            console.log(data);
+            res.json(data);
         }
-    })
-
+    });
 });
 
-//POST
-app.post('/movies/addMovie', function (req, res, err) {
+app.post('/movies', function (req, res) {
     var options = {
-        method: 'POST',
-        endpoint: 'movies',
-        body: {
-            title: req.headers.title,
-            year: req.headers.year,
-            actors: [
+        database: 'movies',
+        collectionName: 'movies',
+        documents: {
+            "title": req.headers.title,
+            "year": req.headers.year,
+            "actors": [
                 req.headers.actor1,
                 req.headers.actor2,
                 req.headers.actor3
@@ -56,63 +62,51 @@ app.post('/movies/addMovie', function (req, res, err) {
         }
     }
 
-    if (!options.body.title) { //If a title wasn't given
+    if (!options.documents.title) { //If a title wasn't given
         res.json({err: 'No Title Provided'});
 
-    } else if (!options.body.year) {
+    } else if (!options.documents.year) {
 
         res.json({err: 'No Year Provided'});
 
-    } else if (!options.body.actors[0]) {
+    } else if (!options.documents.actors[0]) {
 
         res.json({err: 'Sufficient Actors Not Provided, must have 3'});
 
-    } else if (!options.body.actors[1]) {
+    } else if (!options.documents.actors[1]) {
 
         res.json({err: 'Sufficient Actors Not Provided, must have 3'});
 
-    } else if (!options.body.actors[2]) {
+    } else if (!options.documents.actors[2]) {
 
         res.json({err: 'Sufficient Actors Not Provided, must have 3'});
 
     } else {
-
-        client.request(options, function (err, data) {
+        mlab.insertDocuments(options, function(err, data){
             if (err) { //if there was an error
             } else {
                 res.send(data) //Otherwise send the data
             }
         });
-
     }
-
 });
 
-//DELETE
-app.delete('/movies/deleteMovie', function (req, res) {
+app.delete('/movies', function(req, res) {
     var options = {
-        method: 'DELETE',
-        endpoint: 'movies/' + req.headers.title
-    };
-
-    client.request(options, function (err, data) {
-        if (err) { //If there was an error
-            res.json("Please supply the movie title")
-        } else {
-            res.json("Deleted Movie Entry!") //Otherwise, send a success statement
+        database: 'movies',
+        collectionName: 'movies',
+        id: {"_id": req.headers._id}
+    }
+    mlab.deleteDocument(options, function (err, data){
+        if (err) {res.send('Please provide the object ID to be deleted');}
+        else {
+            res.send('Movie has been removed from the database');
+            console.log('Delete successful');
         }
     });
 });
 
-
-//If an incorrect method is given an error message is shown
-app.all('/:no_access', function (req, res) {
-    res.status(400);
-    res.json('Sorry, the method ' + req.method + ' is not allowed');
-});
-
 //start the server
-app.listen(1337);
-
-//tell ourselves what's happening
-console.log('Listening on Port 1337')
+//========
+app.listen(port);
+console.log('Magic happens on port ' + port);
