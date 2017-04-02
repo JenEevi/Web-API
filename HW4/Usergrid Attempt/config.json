@@ -1,8 +1,0 @@
-{
-    "appId": "jguidotti",
-    "authMode": "NONE",
-    "baseUrl": "https://apibaas-trial.apigee.net",
-    "clientId": "yourClientId",
-    "clientSecret": "yourClientSecret",
-    "orgId": "sandbox"
-}
