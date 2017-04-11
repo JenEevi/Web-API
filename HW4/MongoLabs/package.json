@@ -1,0 +1,17 @@
+{
+  "name": "hw4_movie_db",
+  "version": "1.0.0",
+  "description": "Homework 4 for WebAPI",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jennifer Guidotti",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.2",
+    "mongolab-data-api": "^1.1.6",
+    "mongoose": "^4.9.2",
+    "morgan": "^1.8.1"
+  }
+}
