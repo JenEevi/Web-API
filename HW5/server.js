@@ -1,8 +1,11 @@
-//HW5 Jennifer Guidotti
+//HW5 Jennifer Guidotti - Modified
 
 var express = require('express');
 var app = express();
 var bodyparser = require('body-parser');
+var async = require("async");
+var waterfall = require("async/waterfall");
+var parallel = require("async/parallel");
 
 
 var UsergridClient = require('./node_modules/usergrid/lib/client');
@@ -12,12 +15,55 @@ var Usergrid = new UsergridClient
     "appId": "sandbox",
     "orgId": "jguidotti",
     "baseUrl": "https://apibaas-trial.apigee.net"
-})
+});
 
 var UsergridQuery = require('./node_modules/usergrid/lib/query');
 
-app.use(bodyparser.urlencoded({ extended: true}));
+app.use(bodyparser.urlencoded({extended: true}));
 app.use(bodyparser.json());
+
+//Gets the movie and its rating for the title entered
+function getmoviereviews(req, res, query, rquery){
+    async.parallel([
+            //First external endpoint
+            // Make a request to the movie collection
+            //query the movie name
+            function (callback){
+                //make first request
+                //call usergrid then in its callback make this call
+                Usergrid.GET(query, function (error, usergridResponse, entities){
+                    if (error) {
+                        callback(error, null);}
+                    else {
+                        callback(null, usergridResponse.entities);
+                    }
+                })
+            },
+//Second external endpoint
+//Make a request to the reviews collection
+//query the review with corresponding movie name
+            function (callback){
+                //same as above
+                Usergrid.GET(rquery, function(error, usergridResponse, entities){
+                    if (error) {
+                        callback(error, null);}
+                    else {
+                        callback(null, usergridResponse.entities); //make sure to do this in the callback of your request
+                    }
+                })
+            },
+
+        ],
+        //Collate results
+        //Attach the json body with the movie and the review json body and display them together
+        function(err, results) {
+            if(err) { console.log(err); res.send(500,"Server Error"); return; }
+                res.send({movies: results[0], reviews: results[1]});
+            // or similar you could look through the results here an combine it – the points here is you get an array with both objects from the callbacks above
+        }
+    );
+
+}
 
 //Gets all the movies
 app.get('/movies', function (req, res, err) {
@@ -68,41 +114,6 @@ app.get('/movies/:title', function (req, res, err) {
 
 });
 
-//Gets the movies and their rating
-app.get('/movies/rating/:title', function (req, res, err) {
-    //options for the request req.header.title
-
-    //if (req.query.reviews == true) {
-
-        var movies = new UsergridQuery('movies');
-        var reviews = new UsergridQuery('reviews');
-
-        if (req.params.title) {
-            query = new UsergridQuery('movies').eq('title', req.headers.title);
-            reviews = new UsergridQuery('reviews').eq('title', req.headers.title);
-        }
-
-        var entity = new UsergridEntity(query.body.uuid);
-        var entity2 = new UsergridEntity(reviews.body.uuid);
-
-        var relationship = 'title';
-
-        Usergrid.connect(entity, relationship, entity2, function(err, res) {
-            if(res.ok) {
-                Usergrid.GET(reviews, function (err2, data) {
-                    if (err2) {
-                        res.send(err2); //send an error
-                    }
-                    else {
-                        res.send(data); //Otherwise send the movie the user requested
-                    }
-
-                })
-            }
-
-        })
-    //}
-});
 
 //Gets the movie reviews for the title requested
 app.get('/reviews/:title', function (req, res, err) {
@@ -126,10 +137,25 @@ app.get('/reviews/:title', function (req, res, err) {
 
 });
 
+//gets the movies and reviews - HW5
+app.get('/movies/rating/:title', function (req, res, err) {
+    var query = new UsergridQuery('movies'); //Search for all movies
+    var rquery = new UsergridQuery('reviews'); //search for all reviews
+
+    if (req.params.title) //if a title was passed
+    {
+        query = new UsergridQuery('movies').eq('title', req.params.title); //search for that move with the title
+        rquery = new UsergridQuery('reviews').eq('title', req.params.title); //search for that review with the title
+    }
+
+    getmoviereviews(req, res, query, rquery);
+
+});
+
 //POST: Save a movie
 app.post('/movies', function (req, res, err) {
 
-     var query = new UsergridQuery('movies'); //checking if that movie is already in the database
+    var query = new UsergridQuery('movies'); //checking if that movie is already in the database
 
     if (req.params.title)
     {
@@ -191,36 +217,36 @@ app.post('/movies', function (req, res, err) {
 
 });
 
-//POST: Save a review
-app.post('/reviews/:title', function (req, res, err) {
+//POST: Save a review - HW5
+app.post('/reviews', function (req, res, err) {
 
-    var query = new UsergridQuery('reviews'); //checking if that movie is already in the database
+    var query = new UsergridQuery('movies'); //checking if that movie is already in the database
 
     if (req.params.title)
     {
-        query = new UsergridQuery('reviews').eq('title', req.params.title);
+        query = new UsergridQuery('movies').eq('title', req.params.title);
     }
 
-    if(query == !req.params.title) { //if it is in the database, then we exit
+    if(query == req.params.title) { //if it is in the database, then we exit
 
-        res.json('Sorry, but that movie is not in the database');
+        res.json('Sorry, but that movie already exists in the database');
     }
 
     else {
 
         var entity = {
             type: 'reviews',
-            title: req.headers.title,
-            rName: req.headers.rName,
             quote: req.headers.quote,
-            rating: req.headers.rating
+            rating: req.headers.rating,
+            rname: req.headers.rname,
+            title: req.headers.title
         };
 
 
         if (!entity.title) { //If a title wasn't given
             res.json({err: 'No Title Provided'});
 
-        } else if (!entity.rName) { //reviewer name not given
+        } else if (!entity.rname) { //reviewer name not given
 
             res.json({err: 'Reviewer Name was not given'});
 

@@ -9,6 +9,7 @@
   "author": "Jennifer Guidotti",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.3.0",
     "express": "^4.15.2",
     "usergrid": "^2.0.0-rc.2"
   }
